@@ -52,17 +52,32 @@ class DatosMascotaMainActivity: AppCompatActivity() {
         btnEliminar = findViewById(R.id.btnEliminarMascota)
 
         // Recuperar código enviado desde el RecyclerView
-        val bundle = intent.extras!!
-        buscar(bundle.getInt("codigo"))
+        val codigo = intent.getIntExtra("codigo", -1)
+        if (codigo == -1) {
+            showAlert("No se recibieron datos de la mascota")
+            finish()
+            return
+        }
+        buscar(codigo)
 
         btnModificar.setOnClickListener {
-            val cod = txtCodigo.text.toString().toInt()
+            val cod = txtCodigo.text.toString().toIntOrNull()
             val nom = txtNombre.text.toString()
             val esp = txtEspecie.text.toString()
             val raza = txtRaza.text.toString()
-            val edad = txtEdad.text.toString().toInt()
+            val edad = txtEdad.text.toString().toIntOrNull()
             val sexo = atvSexo.text.toString()
-            val peso = txtPeso.text.toString().toDouble()
+            val peso = txtPeso.text.toString().toDoubleOrNull()
+
+            if (cod == null || edad == null || peso == null) {
+                showAlert("Código, edad y peso deben ser numéricos válidos")
+                return@setOnClickListener
+            }
+
+            if (nom.isBlank() || esp.isBlank() || raza.isBlank() || sexo.isBlank()) {
+                showAlert("Completa todos los campos antes de modificar")
+                return@setOnClickListener
+            }
 
             val bean = Mascota(cod, nom, esp, raza, edad, sexo, peso, "")
             val salida = ControllerMascota().update(bean)
@@ -84,6 +99,13 @@ class DatosMascotaMainActivity: AppCompatActivity() {
 
     private fun buscar(cod: Int) {
         val bean = ControllerMascota().findById(cod)
+
+        if (bean == null) {
+            showAlert("Mascota no encontrada")
+            finish()
+            return
+        }
+
         txtCodigo.setText(bean.codigo.toString())
         txtNombre.setText(bean.nombre)
         txtEspecie.setText(bean.especie)
@@ -107,7 +129,12 @@ class DatosMascotaMainActivity: AppCompatActivity() {
             .setTitle("SISTEMA")
             .setMessage(men)
             .setPositiveButton("Aceptar") { _: DialogInterface, _: Int ->
-                val cod = txtCodigo.text.toString().toInt()
+                val cod = txtCodigo.text.toString().toIntOrNull()
+                if (cod == null) {
+                    showAlert("Código inválido")
+                    return@setPositiveButton
+                }
+
                 val salida = ControllerMascota().deletById(cod)
 
                 if (salida > 0)

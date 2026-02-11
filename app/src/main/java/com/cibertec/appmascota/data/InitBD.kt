@@ -8,7 +8,7 @@ class InitBD : SQLiteOpenHelper(
     AppConfig.CONTEXTO,
     "mascotas.bd",
     null,
-    1
+    2
 ) {
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -22,13 +22,14 @@ class InitBD : SQLiteOpenHelper(
                     "raza varchar(30)," +
                     "edad int," +
                     "sexo varchar(15)," +
-                    "peso double" +
+                    "peso double," +
+                    "foto varchar(100) default ''" +
                     ")"
         )
 
         // Datos de prueba
-        db.execSQL("insert into tb_mascota values(null,'Firulais','Perro','Labrador',3,'Macho',25.5)")
-        db.execSQL("insert into tb_mascota values(null,'Michi','Gato','Siames',2,'Hembra',4.2)")
+        db.execSQL("insert into tb_mascota values(null,'Firulais','Perro','Labrador',3,'Macho',25.5,'')")
+        db.execSQL("insert into tb_mascota values(null,'Michi','Gato','Siames',2,'Hembra',4.2,'')")
     }
 
     override fun onUpgrade(
@@ -36,7 +37,9 @@ class InitBD : SQLiteOpenHelper(
         oldVersion: Int,
         newVersion: Int
     ) {
-        // Aquí irían cambios de versión de la BD
+        if (oldVersion < 2) {
+            db.execSQL("alter table tb_mascota add column foto varchar(100) default ''")
+        }
     }
 
 }

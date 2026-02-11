@@ -49,10 +49,20 @@ class NuevaMascotaMainActivity : AppCompatActivity(){
             val nombre = txtNombre.text.toString()
             val especie = txtEspecie.text.toString()
             val raza = txtRaza.text.toString()
-            val edad = txtEdad.text.toString().toInt()
-            val peso = txtPeso.text.toString().toDouble()
+            val edad = txtEdad.text.toString().toIntOrNull()
+            val peso = txtPeso.text.toString().toDoubleOrNull()
             val sexo = atvSexo.text.toString()
             val foto = ""
+
+            if (nombre.isBlank() || especie.isBlank() || raza.isBlank() || sexo.isBlank()) {
+                showAlert("Completa todos los campos antes de guardar")
+                return@setOnClickListener
+            }
+
+            if (edad == null || peso == null) {
+                showAlert("Edad y peso deben ser valores numéricos válidos")
+                return@setOnClickListener
+            }
 
             val mascota = Mascota(
                 0,

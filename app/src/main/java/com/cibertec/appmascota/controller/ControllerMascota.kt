@@ -50,8 +50,8 @@ class ControllerMascota {
         return salida
     }
 
-    fun findById(cod: Int): Mascota {
-        lateinit var bean: Mascota
+    fun findById(cod: Int): Mascota? {
+        var bean: Mascota? = null
 
         val conn = AppConfig.BD.readableDatabase
         val rs = conn.rawQuery(
@@ -59,7 +59,7 @@ class ControllerMascota {
             arrayOf(cod.toString())
         )
 
-        while (rs.moveToNext()) {
+        if (rs.moveToFirst()) {
             bean = Mascota(
                 rs.getInt(0),
                 rs.getString(1),
